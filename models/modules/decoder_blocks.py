@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 from models.modules.aspp import ASPP, ASPPDeformable
 from models.modules.attentions import PSA, SGE
-from config import Config
+from config import config
 
 
-config = Config()
+# config = Config()
 
 
 class BasicDecBlk(nn.Module):

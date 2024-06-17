@@ -2,10 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from models.modules.deform_conv import DeformableConv2d
-from config import Config
+from config import config
 
 
-config = Config()
+# config = Config()
 
 
 class ASPPComplex(nn.Module):
@@ -127,7 +127,7 @@ class _ASPPModuleDeformable(nn.Module):
 
 
 class ASPPDeformable(nn.Module):
-    def __init__(self, in_channels, out_channels=None, num_parallel_block=1):
+    def __init__(self, in_channels, out_channels=None, parallel_block_sizes=[1, 3, 7]):
         super(ASPPDeformable, self).__init__()
         self.down_scale = 1
         if out_channels is None:
@@ -135,9 +135,14 @@ class ASPPDeformable(nn.Module):
         self.in_channelster = 256 // self.down_scale
 
         self.aspp1 = _ASPPModuleDeformable(in_channels, self.in_channelster, 1, padding=0)
-        self.aspp_deforms = nn.ModuleList([
-            _ASPPModuleDeformable(in_channels, self.in_channelster, 3, padding=1) for _ in range(num_parallel_block)
-        ])
+        if config.official == True:
+            self.aspp_deforms = nn.ModuleList([
+                _ASPPModuleDeformable(in_channels, self.in_channelster, conv_size, padding=int(conv_size//2)) for conv_size in parallel_block_sizes
+            ])
+        else:
+            self.aspp_deforms = nn.ModuleList([
+                _ASPPModuleDeformable(in_channels, self.in_channelster, 3, padding=1)
+            ])
 
         self.global_avg_pool = nn.Sequential(nn.AdaptiveAvgPool2d((1, 1)),
                                              nn.Conv2d(in_channels, self.in_channelster, 1, stride=1, bias=False),

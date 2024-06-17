@@ -6,6 +6,10 @@ from folder_paths import models_dir
 
 class Config():
     def __init__(self) -> None:
+        # ------- add by zmq ----------
+        # compatible with 'BiRefNet-massive-epoch_240.pth' and 'BiRefNet-portrait-TR_P3M_10k-epoch_120.pth'
+        self.official = False
+        # -----------------------------
         self.ms_supervision = True
         self.out_ref = self.ms_supervision and True
         self.dec_ipt = True
@@ -108,3 +112,5 @@ class Config():
 
         self.batch_size_valid = 1
         self.rand_seed = 7
+
+config = Config()
